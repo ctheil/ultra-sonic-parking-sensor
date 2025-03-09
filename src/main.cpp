@@ -15,21 +15,30 @@ void setup() {
   USSensor::init(echo_pin, trig_pin);
 }
 
+/** TODO:
+ * 1. Use distance abstraction (median) to prevent jumps
+ *    Cache last n distances and use the abstraction of those to get rid of any
+ *    outliers and prevent the lights from jumping
+ *
+ ** TODO:
+ * 2. Make the `r_dist` configurable via button press or something so that users
+ *    can configure the red light distance at runtime.
+ */
+
 void loop() {
   USSensor::begin();
   delay(1);
 
+  int r_dist = 30; // red light threshold
   int distance = USSensor::getDistance();
 
-  if (distance > 100) {
+  if (distance > r_dist * 4) {
     StopLight::green();
-  } else if (distance > 70) {
+  } else if (distance > r_dist * 3) {
     StopLight::yellow(0);
-  } else if (distance > 10) {
+  } else if (distance > r_dist * 2) {
     StopLight::yellow(distance * 2);
-  } else if (distance > 0) {
-    StopLight::red();
   } else {
-    StopLight::reset();
+    StopLight::red();
   }
 }
